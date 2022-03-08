@@ -650,7 +650,7 @@ mkCardanoTracer :: forall evt.
   -> (evt -> [Text])
   -> (evt -> SeverityS)
   -> (evt -> Privacy)
-  -> IO (Trace IO evt)
+  -> IO (Trace IO evt)    
 ```
 
 ## Documentation generation
