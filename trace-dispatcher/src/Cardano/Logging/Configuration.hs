@@ -60,19 +60,23 @@ configureTracers :: forall a.
   -> Documented a
   -> [Trace IO a]
   -> IO ()
-configureTracers config (Documented documented) tracers = do
-    mapM_ (configureTrace Reset) tracers
-    mapM_ (configureAllTrace (Config config)) tracers
-    mapM_ (configureTrace Optimize) tracers
-  where
-    configureTrace control (Trace tr) =
-      T.traceWith tr (emptyLoggingContext, Left control)
-    configureAllTrace control (Trace tr) =
-      mapM
-        (\ DocMsg {..} -> T.traceWith tr (
-                              emptyLoggingContext {lcNamespace = dmNamespace}
-                            , Left control))
-        documented
+configureTracers _config (Documented _documented) _tracers = undefined --TODO trace-dispatcher-new
+    -- catch
+    --   (do
+    --     mapM_ (configureTrace Reset) tracers
+    --     mapM_ (configureAllTrace (Config config)) tracers
+    --     mapM_ (configureTrace Optimize) tracers)
+    --   (\ (ex :: SomeException) -> print (show ex ++ " " ++ show (head documented)))
+    -- where
+    -- configureTrace control (Trace tr) =
+    --   T.traceWith tr (emptyLoggingContext, Just control, dmPrototype (head documented))
+    -- configureAllTrace control (Trace tr) =
+    --   mapM
+    --     (\d ->
+    --       catch
+    --         (((\ m -> T.traceWith tr (emptyLoggingContext, Just control, m)) . dmPrototype) d)
+    --         (\ (ex :: SomeException) -> print (show ex ++ " " ++ show d)))
+    --     documented
 
 
 -- | Take a selector function called 'extract'.
@@ -103,15 +107,12 @@ withNamespaceConfig name extract withConfig tr = do
         Left (cmap, Just v) ->
           case Map.lookup (lcNamespace lc) cmap of
                 Just val -> do
-                  tt <- trace ("use config lookup " ++ show val ++ " namespace " ++ show (lcNamespace lc))
-                        $ withConfig (Just val) tr
+                  tt <- withConfig (Just val) tr
                   T.traceWith (unpackTrace tt) (lc, Right a)
                 Nothing  -> do
-                  tt <- trace ("use config standard " ++ show v ++ " namespace " ++ show (lcNamespace lc))
-                        $ withConfig (Just v) tr
+                  tt <- withConfig (Just v) tr
                   T.traceWith (unpackTrace tt) (lc, Right a)
-        Left (_cmap, Nothing) -> trace ("unconfigured for namespace " ++ show (lcNamespace lc))
-                                    $ pure ()
+        Left (_cmap, Nothing) -> pure ()
         -- This can happen during reconfiguration, so we don't throw an error any more
     mkTrace ref (lc, Left Reset) = do
       liftIO $ writeIORef ref (Left (Map.empty, Nothing))
