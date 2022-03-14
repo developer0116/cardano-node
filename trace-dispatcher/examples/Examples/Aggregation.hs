@@ -8,7 +8,7 @@ module Examples.Aggregation (
   testAggregation
 ) where
 
-import           Data.Aeson (Value (..), (.=))
+import qualified Data.Aeson as AE
 import qualified Data.HashMap.Strict as HM
 import           Data.Text (pack)
 import           GHC.Generics (Generic)
@@ -27,12 +27,12 @@ data BaseStats = BaseStats {
 instance LogFormatting BaseStats where
   forMachine _dtal BaseStats{..} =
       HM.fromList
-        [ "kind" .= Data.Aeson.String "BaseStats"
-        , "bsMeasure" .= String (pack $ show bsMeasure)
-        , "bsMin" .= String (pack $ show bsMin)
-        , "bsMax" .= String (pack $ show bsMax)
-        , "bsCount" .= String (pack $ show bsCount)
-        , "bsSum" .= String (pack $ show bsSum)
+        [ "kind" AE..= AE.String "BaseStats"
+        , "bsMeasure" AE..= AE.String (pack $ show bsMeasure)
+        , "bsMin" AE..= AE.String (pack $ show bsMin)
+        , "bsMax" AE..= AE.String (pack $ show bsMax)
+        , "bsCount" AE..= AE.String (pack $ show bsCount)
+        , "bsSum" AE..= AE.String (pack $ show bsSum)
         ]
   asMetrics BaseStats {..} =
     [ DoubleM "measure" bsMeasure
