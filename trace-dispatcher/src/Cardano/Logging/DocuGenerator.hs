@@ -103,18 +103,9 @@ documentTracers (Documented documented) tracers = do
   where
     docTrace docIdx dc (Trace tr) =
       mapM_
-        (\ (DocMsg {..}, idx) -> catch (
-            T.traceWith tr (emptyLoggingContext,
+        (\ (DocMsg {..}, idx) ->
+            T.traceWith tr (emptyLoggingContext {lcNamespace = dmNamespace},
                             Left (Document idx dmMarkdown dmMetricsMD dc)))
-            (\ (ex :: SomeException) ->
-                modifyIORef docColl
-                  (\ docMap ->
-                    Map.insert
-                      idx
-                      (case Map.lookup idx docMap of
-                        Just e  -> e { ldDoc = ldDoc e <> "Error generating doc" <> (pack . show) ex}
-                        Nothing -> emptyLogDoc ("Error generating doc" <> (pack . show) ex) [])
-                      docMap)))
         docIdx
 
 

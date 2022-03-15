@@ -31,7 +31,7 @@ import qualified Data.ByteString.Char8 as BS
 import           Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import           Data.List (foldl', maximumBy, nub)
 import qualified Data.Map as Map
-import           Data.Maybe (fromMaybe, mapMaybe, isJust)
+import           Data.Maybe (fromMaybe, mapMaybe)
 import           Data.Text (Text, split, unpack)
 import           Data.Yaml
 import           GHC.Generics
@@ -60,13 +60,20 @@ configureTracers :: forall a.
   -> Documented a
   -> [Trace IO a]
   -> IO ()
-configureTracers config (Documented _documented) tracers = do
+configureTracers config (Documented documented) tracers = do
     mapM_ (configureTrace Reset) tracers
-    mapM_ (configureTrace (Config config)) tracers
+    mapM_ (configureAllTrace (Config config)) tracers
     mapM_ (configureTrace Optimize) tracers
   where
     configureTrace control (Trace tr) =
       T.traceWith tr (emptyLoggingContext, Left control)
+    configureAllTrace control (Trace tr) =
+      mapM
+        (\ DocMsg {..} -> T.traceWith tr (
+                              emptyLoggingContext {lcNamespace = dmNamespace}
+                            , Left control))
+        documented
+
 
 
 -- | Take a selector function called 'extract'.
@@ -74,7 +81,7 @@ configureTracers config (Documented _documented) tracers = do
 -- In this way construct a trace transformer with a config value
 withNamespaceConfig :: forall m a b c. (MonadIO m, Ord b, Show b) =>
      String
-  -> (TraceConfig -> m [(Namespace, b)])
+  -> (TraceConfig -> Namespace -> m b)
   -> (Maybe b -> Trace m c -> m (Trace m a))
   -> Trace m c
   -> m (Trace m a)
@@ -97,42 +104,45 @@ withNamespaceConfig name extract withConfig tr = do
         Left (cmap, Just v) ->
           case Map.lookup (lcNamespace lc) cmap of
                 Just val -> do
-                  tt <- withConfig (Just val) tr
+                  tt <- trace ("use config lookup " ++ show val ++ " namespace " ++ show (lcNamespace lc))
+                        $ withConfig (Just val) tr
                   T.traceWith (unpackTrace tt) (lc, Right a)
                 Nothing  -> do
-                  tt <- withConfig (Just v) tr
+                  tt <- trace ("use config standard " ++ show v ++ " namespace " ++ show (lcNamespace lc))
+                        $ withConfig (Just v) tr
                   T.traceWith (unpackTrace tt) (lc, Right a)
-        Left (_cmap, Nothing) -> pure ()
+        Left (_cmap, Nothing) -> trace ("unconfigured for namespace " ++ show (lcNamespace lc))
+                                    $ pure ()
         -- This can happen during reconfiguration, so we don't throw an error any more
     mkTrace ref (lc, Left Reset) = do
       liftIO $ writeIORef ref (Left (Map.empty, Nothing))
       tt <- withConfig Nothing tr
       T.traceWith (unpackTrace tt) (lc, Left Reset)
 
-    mkTrace ref (lc, Left (Config c)) = undefined -- rewrite for version 2
-      -- ! val <- extract c (lcNamespace lc)
-      -- eitherConf <- liftIO $ readIORef ref
-      -- case eitherConf of
-      --   Left (cmap, Nothing) ->
-      --     case Map.lookup (lcNamespace lc) cmap of
-      --       Nothing -> do
-      --         liftIO
-      --             $ writeIORef ref
-      --             $ Left (Map.insert (lcNamespace lc) val cmap, Nothing)
-      --         Trace tt <- withConfig (Just val) tr
-      --         T.traceWith tt (lc, Left (Config c))
-      --       Just v  -> do
-      --         if v == val
-      --           then do
-      --             Trace tt <- withConfig (Just val) tr
-      --             T.traceWith tt (lc, Left (Config c))
-      --           else error $ "Inconsistent trace configuration with context "
-      --                             ++ show (lcNamespace lc)
-      --   Right _val -> error $ "Trace not reset before reconfiguration (1)"
-      --                       ++ show (lcNamespace lc)
-      --   Left (_cmap, Just _v) -> error $ "Trace not reset before reconfiguration (2)"
-      --                       ++ show (lcNamespace lc)
-      --
+    mkTrace ref (lc, Left (Config c)) = do
+      ! val <- extract c (lcNamespace lc)
+      eitherConf <- liftIO $ readIORef ref
+      case eitherConf of
+        Left (cmap, Nothing) ->
+          case Map.lookup (lcNamespace lc) cmap of
+            Nothing -> do
+              liftIO
+                  $ writeIORef ref
+                  $ Left (Map.insert (lcNamespace lc) val cmap, Nothing)
+              Trace tt <- withConfig (Just val) tr
+              T.traceWith tt (lc, Left (Config c))
+            Just v  -> do
+              if v == val
+                then do
+                  Trace tt <- withConfig (Just val) tr
+                  T.traceWith tt (lc, Left (Config c))
+                else error $ "Inconsistent trace configuration with context "
+                                  ++ show (lcNamespace lc)
+        Right _val -> error $ "Trace not reset before reconfiguration (1)"
+                            ++ show (lcNamespace lc)
+        Left (_cmap, Just _v) -> error $ "Trace not reset before reconfiguration (2)"
+                            ++ show (lcNamespace lc)
+
     mkTrace ref (lc, Left Optimize) = do
       eitherConf <- liftIO $ readIORef ref
       case eitherConf of
@@ -289,60 +299,66 @@ withLimitersFromConfig tr trl = do
 --------------------------------------------------------
 
 -- | If no severity can be found in the config, it is set to Warning
-getSeverity :: TraceConfig -> [(Namespace, SeverityF)]
-getSeverity config = case getOption severitySelector config of
-                          sevs -> sevs
-                          [] -> [([], SeverityF (Just Warning))]
+getSeverity :: TraceConfig -> Namespace -> SeverityF
+getSeverity config ns =
+    fromMaybe (SeverityF (Just Warning)) (getOption severitySelector config ns)
   where
     severitySelector :: ConfigOption -> Maybe SeverityF
     severitySelector (ConfSeverity s) = Just s
     severitySelector _              = Nothing
 
-getSeverity' :: Applicative m => TraceConfig ->  m [(Namespace, SeverityF)]
-getSeverity' config = pure $ getSeverity config
+getSeverity' :: Applicative m => TraceConfig -> Namespace -> m SeverityF
+getSeverity' config ns = pure $ getSeverity config ns
 
 -- | If no details can be found in the config, it is set to DNormal
-getDetails :: TraceConfig -> [(Namespace, DetailLevel)]
-getDetails config = case getOption detailSelector config of
-                      dls -> dls
-                      [] -> [([], DNormal)]
+getDetails :: TraceConfig -> Namespace -> DetailLevel
+getDetails config ns =
+    fromMaybe DNormal (getOption detailSelector config ns)
   where
     detailSelector :: ConfigOption -> Maybe DetailLevel
     detailSelector (ConfDetail d) = Just d
     detailSelector _            = Nothing
 
-getDetails' :: Applicative m => TraceConfig -> m [(Namespace, DetailLevel)]
-getDetails' config = pure $ getDetails config
+getDetails' :: Applicative m => TraceConfig -> Namespace -> m DetailLevel
+getDetails' config ns = pure $ getDetails config ns
 
 -- | If no backends can be found in the config, it is set to
 -- [EKGBackend, Forwarder, Stdout HumanFormatColoured]
-getBackends :: TraceConfig -> [(Namespace, [BackendConfig])]
-getBackends config = case getOption backendSelector config of
-      opts -> opts
-      [] -> [([], [EKGBackend, Forwarder, Stdout HumanFormatColoured])]
+getBackends :: TraceConfig -> Namespace -> [BackendConfig]
+getBackends config ns =
+    fromMaybe [EKGBackend, Forwarder, Stdout HumanFormatColoured]
+      (getOption backendSelector config ns)
   where
     backendSelector :: ConfigOption -> Maybe [BackendConfig]
     backendSelector (ConfBackend s) = Just s
     backendSelector _             = Nothing
 
-getBackends' :: Applicative m => TraceConfig -> m [(Namespace, [BackendConfig])]
-getBackends' config = pure $ getBackends config
+getBackends' :: Applicative m => TraceConfig -> Namespace -> m [BackendConfig]
+getBackends' config ns = pure $ getBackends config ns
 
 -- | May return a limiter specification
-getLimiterSpec :: TraceConfig -> [(Namespace, (Text, Double))]
-getLimiterSpec = getOption limiterExtractor
+getLimiterSpec :: TraceConfig -> Namespace -> Maybe (Text, Double)
+getLimiterSpec = getOption limiterSelector
   where
-    limiterExtractor :: ConfigOption -> Maybe (Text, Double)
-    limiterExtractor (ConfLimiter n f) = Just (n, f)
-    limiterExtractor _                 = Nothing
+    limiterSelector :: ConfigOption -> Maybe (Text, Double)
+    limiterSelector (ConfLimiter n f) = Just (n, f)
+    limiterSelector _               = Nothing
 
 
--- Get option extracted from the config to find an option
-getOption :: (ConfigOption -> Maybe a) -> TraceConfig -> [(Namespace, a)]
-getOption sel config = concatMap
-                          (\(ns,sort) -> zip (repeat ns)
-                                             (mapMaybe sel sort))
-                          (Map.toList $ tcOptions config)
+-- | Searches in the config to find an option
+getOption :: (ConfigOption -> Maybe a) -> TraceConfig -> Namespace -> Maybe a
+getOption sel config [] =
+  case Map.lookup [] (tcOptions config) of
+    Nothing -> Nothing
+    Just options -> case mapMaybe sel options of
+                      []        -> Nothing
+                      (opt : _) -> Just opt
+getOption sel config ns =
+  case Map.lookup ns (tcOptions config) of
+    Nothing -> getOption sel config (init ns)
+    Just options -> case mapMaybe sel options of
+                      []        -> getOption sel config (init ns)
+                      (opt : _) -> Just opt
 
 -- -----------------------------------------------------------------------------
 -- Configuration file
