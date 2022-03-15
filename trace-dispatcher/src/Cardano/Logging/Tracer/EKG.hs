@@ -6,7 +6,7 @@ module Cardano.Logging.Tracer.EKG (
   ekgTracer
 ) where
 
-import           Cardano.Logging.DocuGenerator
+--import           Cardano.Logging.DocuGenerator
 import           Cardano.Logging.Types
 
 import           Control.Monad.IO.Class (MonadIO, liftIO)
@@ -34,15 +34,15 @@ ekgTracer storeOrServer = liftIO $ do
          IORef (Map.Map Text Gauge.Gauge)
       -> IORef (Map.Map Text Label.Label)
       -> IORef (Map.Map Text Counter.Counter)
-      -> (LoggingContext, Maybe TraceControl, FormattedMessage)
+      -> (LoggingContext, Either TraceControl FormattedMessage)
       -> m ()
     output rgsGauges rgsLabels rgsCounters
-      (LoggingContext{..}, Nothing, FormattedMetrics m) =
+      (LoggingContext{..}, Right (FormattedMetrics m)) =
         liftIO $ mapM_
           (setIt rgsGauges rgsLabels rgsCounters lcNamespace) m
-    output _ _ _ p@(_, Just Document {}, FormattedMetrics m) =
-      docIt EKGBackend (FormattedMetrics m) p
-    output _ _ _ (LoggingContext{}, Just _c, _v) =
+    output _ _ _ (_, Left Document {}) = undefined --TODO trace-dispatcher-new
+--      docIt EKGBackend (FormattedMetrics m) p
+    output _ _ _ (LoggingContext{}, _) =
       pure ()
 
     setIt ::

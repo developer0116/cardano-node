@@ -4,8 +4,7 @@
 
 # Contents
 
-0. [Contents](#Contents)
-1. [Document status](#Document-status)
+1. [Contents](#Contents)
 2. [Introduction](#Introduction)
    1. [Motivation](#motivation)
    2. [Design decisions](#Design-decisions)
@@ -707,6 +706,4 @@ There is a number of topics that were discussed, but deferred to a latter iterat
 
 1. Lightweight documentation references, GHC style -- this would allow us to refer to named pieces of documentation in source code, as opposed to copy-pasting them into trace documentation.
 
-2. Change of human-oriented presentation machinery.
-
-3. We want to enhance the library, so that the completeness of `Documented` will be checked by the Haskell type checker.
+2. We want to enhance the library, so that the completeness of `Documented` will be checked by the Haskell type checker.

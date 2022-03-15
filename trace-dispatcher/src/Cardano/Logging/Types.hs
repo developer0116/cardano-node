@@ -1,9 +1,11 @@
-{-# LANGUAGE DeriveGeneric        #-}
-{-# LANGUAGE GADTs                #-}
-{-# LANGUAGE RankNTypes           #-}
-{-# LANGUAGE RecordWildCards      #-}
-{-# LANGUAGE StandaloneDeriving   #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeSynonymInstances #-}
+
 
 module Cardano.Logging.Types (
     Trace(..)
@@ -63,12 +65,15 @@ import           Ouroboros.Network.Util.ShowProxy (ShowProxy (..))
 -- | The Trace carries the underlying tracer Tracer from the contra-tracer package.
 --   It adds a 'LoggingContext' and maybe a 'TraceControl' to every message.
 newtype Trace m a = Trace
-  {unpackTrace :: T.Tracer m (LoggingContext, Maybe TraceControl, a)}
+  {unpackTrace :: T.Tracer m (LoggingContext, Either TraceControl a)}
 
 -- | Contramap lifted to Trace
 instance Monad m => T.Contravariant (Trace m) where
     contramap f (Trace tr) = Trace $
-      T.contramap (\ (lc, mbC, a) -> (lc, mbC, f a)) tr
+      T.contramap (\case
+                      (lc, Right a) -> (lc, Right (f a))
+                      (lc, Left tc) -> (lc, Left tc))
+                  tr
 
 -- | @tr1 <> tr2@ will run @tr1@ and then @tr2@ with the same input.
 instance Monad m => Semigroup (Trace m a) where
@@ -130,7 +135,7 @@ type Namespace = [Text]
 -- | Document a message by giving a prototype, its most special name in the namespace
 -- and a comment in markdown format
 data DocMsg a = DocMsg {
-    dmPrototype :: a
+    dmNamespace :: Namespace
   , dmMetricsMD :: [(Text, Text)]
   , dmMarkdown  :: Text
 }
