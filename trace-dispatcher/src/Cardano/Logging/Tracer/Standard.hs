@@ -16,7 +16,7 @@ import           Data.Text (Text)
 import qualified Data.Text.IO as TIO
 import           System.IO (hFlush, stdout)
 
--- import           Cardano.Logging.DocuGenerator
+import           Cardano.Logging.DocuGenerator
 import           Cardano.Logging.Types
 
 import qualified Control.Tracer as T
@@ -56,11 +56,10 @@ standardTracer = do
         Nothing -> when (isNothing $ stRunning st) $
                       startStdoutThread stateRef
         Just _  -> pure ()
-    output _ _lk (Left Document {}) = undefined --TODO trace-dispatcher-new
-       -- docIt
-       --  (Stdout (if co then HumanFormatColoured else HumanFormatUncoloured))
-       --  (FormattedHuman co "")
-       --  (lk, Just c, msg)
+    output _ lk c@(Left Document {}) =
+       docIt
+        (Stdout MachineFormat) -- TODO Find out the right format
+        (lk, c)
     output _stateRef LoggingContext {} _ = pure ()
 
 -- | Forks a new thread, which writes messages to stdout

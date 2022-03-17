@@ -11,7 +11,6 @@ module Cardano.Logging.Types (
     Trace(..)
   , LogFormatting(..)
   , Metric(..)
-  , mkObject
   , emptyObject
   , Documented(..)
   , DocMsg(..)
@@ -113,10 +112,6 @@ data Metric
     | CounterM Text (Maybe Int)
   deriving (Show, Eq)
 
--- | A helper function for creating an |Object| given a list of pairs, named items,
--- or the empty |Object|.
-mkObject :: [(Text, a)] -> HM.HashMap Text a
-mkObject = HM.fromList
 
 -- | A helper function for creating an empty |Object|.
 emptyObject :: HM.HashMap Text a
@@ -246,6 +241,7 @@ data FormattedMessage =
     | FormattedMetrics [Metric]
     | FormattedForwarder TraceObject
   deriving (Eq, Show)
+
 
 -- |
 data BackendConfig =
@@ -389,6 +385,7 @@ data TraceControl where
     Optimize  :: TraceControl
     Document  :: Int -> Text -> [(Text, Text)] -> DocCollector -> TraceControl
 
+
 newtype DocCollector = DocCollector (IORef (Map Int LogDoc))
 
 data LogDoc = LogDoc {
@@ -398,7 +395,7 @@ data LogDoc = LogDoc {
   , ldSeverity   :: ! [SeverityS]
   , ldPrivacy    :: ! [Privacy]
   , ldDetails    :: ! [DetailLevel]
-  , ldBackends   :: ! [(BackendConfig, FormattedMessage)]
+  , ldBackends   :: ! [BackendConfig]
   , ldFiltered   :: ! [SeverityF]
   , ldLimiter    :: ! [(Text, Double)]
 } deriving(Eq, Show)

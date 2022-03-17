@@ -36,8 +36,6 @@ import           Data.Text (Text, split, unpack)
 import           Data.Yaml
 import           GHC.Generics
 
-import           Debug.Trace
-
 import           Cardano.Logging.DocuGenerator (addFiltered, addLimiter)
 import           Cardano.Logging.FrequencyLimiter (LimitingMessage (..), limitFrequency)
 import           Cardano.Logging.Trace (filterTraceBySeverity, setDetails)
@@ -79,7 +77,7 @@ configureTracers config (Documented documented) tracers = do
 -- | Take a selector function called 'extract'.
 -- Take a function from trace to trace with this config dependent value.
 -- In this way construct a trace transformer with a config value
-withNamespaceConfig :: forall m a b c. (MonadIO m, Ord b, Show b) =>
+withNamespaceConfig :: forall m a b c. (MonadIO m, Ord b) =>
      String
   -> (TraceConfig -> Namespace -> m b)
   -> (Maybe b -> Trace m c -> m (Trace m a))
@@ -97,22 +95,18 @@ withNamespaceConfig name extract withConfig tr = do
       eitherConf <- liftIO $ readIORef ref
       case eitherConf of
         Right val -> do
-          tt <- trace ("use config simple " ++ show val ++ " namespace " ++ show (lcNamespace lc))
-                $ withConfig (Just val) tr
+          tt <- withConfig (Just val) tr
           T.traceWith
             (unpackTrace tt) (lc, Right a)
         Left (cmap, Just v) ->
           case Map.lookup (lcNamespace lc) cmap of
                 Just val -> do
-                  tt <- trace ("use config lookup " ++ show val ++ " namespace " ++ show (lcNamespace lc))
-                        $ withConfig (Just val) tr
+                  tt <- withConfig (Just val) tr
                   T.traceWith (unpackTrace tt) (lc, Right a)
                 Nothing  -> do
-                  tt <- trace ("use config standard " ++ show v ++ " namespace " ++ show (lcNamespace lc))
-                        $ withConfig (Just v) tr
+                  tt <- withConfig (Just v) tr
                   T.traceWith (unpackTrace tt) (lc, Right a)
-        Left (_cmap, Nothing) -> trace ("unconfigured for namespace " ++ show (lcNamespace lc))
-                                    $ pure ()
+        Left (_cmap, Nothing) -> pure ()
         -- This can happen during reconfiguration, so we don't throw an error any more
     mkTrace ref (lc, Left Reset) = do
       liftIO $ writeIORef ref (Left (Map.empty, Nothing))

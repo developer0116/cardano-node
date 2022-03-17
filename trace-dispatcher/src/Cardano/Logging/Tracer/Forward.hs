@@ -12,7 +12,7 @@ import           Control.Monad.IO.Class
 import qualified Control.Tracer as T
 import           Trace.Forward.Utils.TraceObject (ForwardSink, writeToSink)
 
--- import           Cardano.Logging.DocuGenerator
+import           Cardano.Logging.DocuGenerator
 import           Cardano.Logging.Types
 
 ---------------------------------------------------------------------------
@@ -32,6 +32,6 @@ forwardTracer forwardSink =
     writeToSink sink lo
   output _sink LoggingContext {} (Left Reset) = liftIO $ do
     pure ()
-  output _sink _lk (Left Document {}) = undefined --TODO trace-dispatcher-new
---    docIt Forwarder (FormattedForwarder lo) (lk, Just c, lo)
+  output _sink lk (Left c@Document {}) =
+    docIt Forwarder (lk, Left c)
   output _sink LoggingContext {} _  = pure ()

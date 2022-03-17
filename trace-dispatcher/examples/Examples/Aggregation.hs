@@ -9,7 +9,6 @@ module Examples.Aggregation (
 ) where
 
 import           Data.Aeson (Value (..), (.=))
-import qualified Data.HashMap.Strict as HM
 import           Data.Text (pack)
 import           GHC.Generics (Generic)
 
@@ -26,7 +25,7 @@ data BaseStats = BaseStats {
 
 instance LogFormatting BaseStats where
   forMachine _dtal BaseStats{..} =
-      HM.fromList
+      mconcat
         [ "kind" .= Data.Aeson.String "BaseStats"
         , "bsMeasure" .= String (pack $ show bsMeasure)
         , "bsMin" .= String (pack $ show bsMin)
