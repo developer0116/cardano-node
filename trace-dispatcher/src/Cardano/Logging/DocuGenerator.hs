@@ -1,8 +1,10 @@
-{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Cardano.Logging.DocuGenerator (
-    documentMarkdown
+    addNamespaceDocumented
+  , addDocs
+  , documentMarkdown
   , buildersToText
   , docIt
   , addFiltered
@@ -25,11 +27,18 @@ import           Data.Text (Text, pack, toLower)
 import qualified Data.Text as T
 import           Data.Text.Internal.Builder (toLazyText)
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, fromString, fromText,
-                     singleton)
+import           Data.Text.Lazy.Builder (Builder, fromString, fromText, singleton)
 import           Data.Time (getZonedTime)
 import           Trace.Forward.Utils.DataPoint (DataPoint (..))
 
+addNamespaceDocumented :: Namespace -> Documented a -> Documented a
+addNamespaceDocumented ns (Documented list) =
+  Documented $ map
+    (\ dm@DocMsg {} -> dm {dmNamespace = ns ++ dmNamespace dm})
+    list
+
+addDocs :: Documented a -> Documented a -> Documented a
+addDocs (Documented l) (Documented r) = Documented (l ++ r)
 
 data DocuResult =
   DocuTracer Builder
