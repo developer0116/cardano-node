@@ -75,7 +75,7 @@ jsonEncodingOptions = defaultOptions
 docResourceStats :: Documented ResourceStats
 docResourceStats = Documented [
       DocMsg
-        ["Node","Resources"]
+        ["Resources"]
         [("stat.cputicks", "Reports the CPU ticks, sice the process was started")
         ,("mem.resident", "TODO JNF")
         ,("rts.gcLiveBytes", "TODO JNF")
