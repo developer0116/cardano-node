@@ -375,7 +375,7 @@ mkNodeToClientTracers trBase trForward mbTrEKG _trDataPoint trConfig = do
         namesForTChainSync
         severityTChainSync
         allPublic
-    configureTracers trConfig docTChainSync [chainSyncTr]
+    configureTracers trConfig docTChainSyncNodeToClient [chainSyncTr]
     txMonitorTr <-
       mkCardanoTracer
         trBase trForward mbTrEKG
@@ -636,7 +636,7 @@ mkDiffusionTracersExtra trBase trForward mbTrEKG _trDataPoint trConfig EnabledP2
       namesForInboundGovernorTransition
       severityInboundGovernorTransition
       allPublic
-    configureTracers trConfig docInboundGovernorRemote [inboundGovernorTr]
+    configureTracers trConfig docInboundGovernorTransition [inboundGovernorTransitionsTr]
     localConnectionManagerTr  <-  mkCardanoTracer
       trBase trForward mbTrEKG
       "LocalConnectionManager"

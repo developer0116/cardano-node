@@ -435,6 +435,22 @@ docTracers configFileName outputFileName _ _ _ = do
         (BlockFetch.TraceLabelPeer peer (TraceSendRecv
           (ChainSync x (Point blk) (Tip blk)))))
 
+    txMonitorTr <-
+      mkCardanoTracer
+        trBase trForward mbTrEKG
+        "TxMonitorClient"
+        namesForTTxMonitor
+        severityTTxMonitor
+        allPublic
+    configureTracers trConfig docTTxMonitor [txMonitorTr]
+    txMonitorTrDoc <- documentTracer trConfig txMonitorTr
+      (docTTxMonitor :: Documented
+        (TraceLabelPeer localPeer
+           (TraceSendRecv
+              (LTM.LocalTxMonitor
+                 (GenTxId blk) (GenTx blk) SlotNo))))
+
+
     txSubmissionTr  <-  mkCardanoTracer
                 trBase trForward mbTrEKG
                 "TxSubmissionClient"
@@ -690,6 +706,18 @@ docTracers configFileName outputFileName _ _ _ = do
           Socket.SockAddr
           (ConnectionHandlerTrace UnversionedProtocol UnversionedProtocolData)))
 
+    connectionManagerTransitionsTr  <-  mkCardanoTracer
+      trBase trForward mbTrEKG
+      "ConnectionManagerTransition"
+      (namesForConnectionManagerTransition @RemoteAddress)
+      severityConnectionManagerTransition
+      allPublic
+    configureTracers trConfig docConnectionManagerTransition [connectionManagerTransitionsTr]
+    connectionManagerTransitionsTrDoc <- documentTracer trConfig connectionManagerTr
+     (docConnectionManagerTransition :: Documented
+        (ConnectionManager.AbstractTransitionTrace peerAddr))
+
+
     serverTr  <-  mkCardanoTracer
       trBase trForward mbTrEKG
       "Server"
@@ -709,6 +737,17 @@ docTracers configFileName outputFileName _ _ _ = do
     configureTracers trConfig docInboundGovernorRemote [inboundGovernorTr]
     inboundGovernorTrDoc <- documentTracer trConfig inboundGovernorTr
       (docInboundGovernorRemote :: Documented (InboundGovernorTrace Socket.SockAddr))
+
+    inboundGovernorTransitionsTr  <-  mkCardanoTracer
+      trBase trForward mbTrEKG
+      "InboundGovernorTransition"
+      namesForInboundGovernorTransition
+      severityInboundGovernorTransition
+      allPublic
+    configureTracers trConfig docInboundGovernorTransition [inboundGovernorTransitionsTr]
+    inboundGovernorTransitionsTrDoc <- documentTracer trConfig inboundGovernorTransitionsTr
+       (docInboundGovernorTransition ::
+          Documented (InboundGovernor.RemoteTransitionTrace peerAddr))   
 
     localConnectionManagerTr  <-  mkCardanoTracer
       trBase trForward mbTrEKG
@@ -834,6 +873,7 @@ docTracers configFileName outputFileName _ _ _ = do
 -- NodeToClient
             <> keepAliveClientTrDoc
             <> chainSyncTrDoc
+            <> txMonitorTrDoc
             <> txSubmissionTrDoc
             <> stateQueryTrDoc
 -- Node to Node
