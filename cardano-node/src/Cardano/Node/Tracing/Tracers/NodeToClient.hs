@@ -13,6 +13,7 @@ module Cardano.Node.Tracing.Tracers.NodeToClient
   , docTChainSyncNodeToClient
   , docTChainSyncNodeToNode
   , docTChainSyncNodeToNodeSerisalised
+  , docTChainSync
 
   , severityTTxMonitor
   , namesForTTxMonitor

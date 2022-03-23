@@ -155,9 +155,9 @@ mkDispatchTracers nodeKernel trBase trForward mbTrEKG trDataPoint trConfig enabl
     replayBlockTr' <- withReplayedBlock replayBlockTr
     -- Filter out replayed blocks for this tracer
     let chainDBTr' = filterTrace
-                      (\case (_, Nothing, ChainDB.TraceLedgerReplayEvent
+                      (\case (_, ChainDB.TraceLedgerReplayEvent
                                             LedgerDB.ReplayedBlock {}) -> False
-                             (_, _, _) -> True)
+                             (_, _) -> True)
                       chainDBTr
 
     consensusTr :: Consensus.Tracers
