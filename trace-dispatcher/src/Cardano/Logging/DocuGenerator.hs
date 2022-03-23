@@ -2,7 +2,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Cardano.Logging.DocuGenerator (
-    addNamespaceDocumented
+    addDocumentedNamespace
   , addDocs
   , documentMarkdown
   , buildersToText
@@ -13,8 +13,6 @@ module Cardano.Logging.DocuGenerator (
   , docTracerDatapoint
   , showT
   , DocuResult
-  , appDoc
-  , mapDoc
 ) where
 
 import           Cardano.Logging.Types
@@ -31,14 +29,6 @@ import           Data.Text.Lazy.Builder (Builder, fromString, fromText, singleto
 import           Data.Time (getZonedTime)
 import           Trace.Forward.Utils.DataPoint (DataPoint (..))
 
-addNamespaceDocumented :: Namespace -> Documented a -> Documented a
-addNamespaceDocumented ns (Documented list) =
-  Documented $ map
-    (\ dm@DocMsg {} -> dm {dmNamespace = ns ++ dmNamespace dm})
-    list
-
-addDocs :: Documented a -> Documented a -> Documented a
-addDocs (Documented l) (Documented r) = Documented (l ++ r)
 
 data DocuResult =
   DocuTracer Builder
@@ -82,11 +72,20 @@ documentTracers (Documented documented) tracers = do
 showT :: Show a => a -> Text
 showT = pack . show
 
-appDoc :: (Namespace -> Namespace) -> DocMsg a -> DocMsg b
-appDoc f DocMsg {..} = DocMsg  (f dmNamespace) dmMetricsMD dmMarkdown
+-- appDoc :: (Namespace -> Namespace) -> DocMsg a -> DocMsg b
+-- appDoc f DocMsg {..} = DocMsg  (f dmNamespace) dmMetricsMD dmMarkdown
+--
+-- mapDoc :: (Namespace -> Namespace) -> [DocMsg a] -> [DocMsg b]
+-- mapDoc f = map (appDoc f)
 
-mapDoc :: (Namespace -> Namespace) -> [DocMsg a] -> [DocMsg b]
-mapDoc f = map (appDoc f)
+addDocumentedNamespace  :: Namespace -> Documented a -> Documented b
+addDocumentedNamespace  ns (Documented list) =
+  Documented $ map
+    (\ dm@DocMsg {} -> dm {dmNamespace = ns ++ dmNamespace dm})
+    list
+
+addDocs :: Documented a -> Documented a -> Documented a
+addDocs (Documented l) (Documented r) = Documented (l ++ r)
 
 docTracer :: MonadIO m =>
      BackendConfig
