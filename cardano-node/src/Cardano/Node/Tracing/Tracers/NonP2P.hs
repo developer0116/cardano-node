@@ -166,7 +166,7 @@ docIPSubscription = Documented $ map withIPList (undoc docSubscription)
   where
     withIPList (DocMsg v nl comment) =
       DocMsg
-        (["IPSubscription", "IP"] ++ v)
+        (["IP"] ++ v)
         nl
         ("IP Subscription: " <> comment)
 
@@ -225,7 +225,7 @@ docDNSSubscription = Documented $ map withDomainName (undoc docSubscription)
   where
     withDomainName (DocMsg v nl comment) =
       DocMsg
-        (["DNSSubscription", "DNS"] ++ v)
+        (["DNS"] ++ v)
         nl
         ("DNS Subscription: " <> comment)
 
@@ -342,7 +342,7 @@ instance LogFormatting (WithDomainName DnsTrace) where
                   <> "."
 
 docDNSResolver :: Documented (WithDomainName DnsTrace)
-docDNSResolver = addDocumentedNamespace  ["DNSResolver"] docDNSResolver'
+docDNSResolver = addDocumentedNamespace  [] docDNSResolver'
 
 docDNSResolver' :: Documented (WithDomainName DnsTrace)
 docDNSResolver' = Documented [
@@ -415,7 +415,7 @@ instance Show addr => LogFormatting (NtN.WithAddr addr NtN.ErrorPolicyTrace) whe
 
 -- WithDomainName has strict constructors
 docErrorPolicy :: Documented (WithAddr Socket.SockAddr ErrorPolicyTrace)
-docErrorPolicy = addDocumentedNamespace  ["ErrorPolicy"] docErrorPolicy'
+docErrorPolicy = addDocumentedNamespace  [] docErrorPolicy'
 
 --------------------------------------------------------------------------------
 -- LocalErrorPolicy Tracer
@@ -449,7 +449,7 @@ namesForLocalErrorPolicy (WithAddr _ ev) = case ev of
 
 
 docLocalErrorPolicy :: Documented (WithAddr LocalAddress ErrorPolicyTrace)
-docLocalErrorPolicy = addDocumentedNamespace  ["LocalErrorPolicy"] docErrorPolicy'
+docLocalErrorPolicy = addDocumentedNamespace  [] docErrorPolicy'
 
 -- WithAddr has strict constructors
 
@@ -533,7 +533,7 @@ instance LogFormatting NtN.AcceptConnectionsPolicyTrace where
     forHuman   = showT
 
 docAcceptPolicy :: Documented NtN.AcceptConnectionsPolicyTrace
-docAcceptPolicy = addDocumentedNamespace  ["AcceptPolicy"] docAcceptPolicy'
+docAcceptPolicy = addDocumentedNamespace  [] docAcceptPolicy'
 
 docAcceptPolicy' :: Documented NtN.AcceptConnectionsPolicyTrace
 docAcceptPolicy' = Documented [

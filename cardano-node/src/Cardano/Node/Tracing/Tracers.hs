@@ -371,7 +371,7 @@ mkNodeToClientTracers trBase trForward mbTrEKG _trDataPoint trConfig = do
     chainSyncTr <-
       mkCardanoTracer
         trBase trForward mbTrEKG
-        "ChainSyncClient"
+        "ChainSync"
         namesForTChainSync
         severityTChainSync
         allPublic
@@ -427,14 +427,14 @@ mkNodeToNodeTracers trBase trForward mbTrEKG _trDataPoint trConfig = do
                 namesForTChainSyncNode
                 severityTChainSyncNode
                 allPublic
-    configureTracers trConfig docTChainSync [chainSyncTracer]
+    configureTracers trConfig docTChainSyncNodeToNode [chainSyncTracer]
     chainSyncSerialisedTr <-  mkCardanoTracer
                 trBase trForward mbTrEKG
                 "ChainSyncSerialised"
                 namesForTChainSyncSerialised
                 severityTChainSyncSerialised
                 allPublic
-    configureTracers trConfig docTChainSync [chainSyncSerialisedTr]
+    configureTracers trConfig docTChainSyncNodeToNodeSerisalised [chainSyncSerialisedTr]
     blockFetchTr  <-  mkCardanoTracer
                 trBase trForward mbTrEKG
                 "BlockFetch"

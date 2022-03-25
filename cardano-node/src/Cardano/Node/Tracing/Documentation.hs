@@ -426,13 +426,13 @@ docTracers configFileName outputFileName _ _ _ = do
 
     chainSyncTr  <-  mkCardanoTracer
                 trBase trForward mbTrEKG
-                "ChainSyncClient"
+                "ChainSync"
                 namesForTChainSync
                 severityTChainSync
                 allPublic
-    configureTracers trConfig docTChainSync [chainSyncTr]
+    configureTracers trConfig docTChainSyncNodeToClient [chainSyncTr]
     chainSyncTrDoc <- documentTracer trConfig chainSyncTr
-      (docTChainSync :: Documented
+      (docTChainSyncNodeToClient :: Documented
         (BlockFetch.TraceLabelPeer peer (TraceSendRecv
           (ChainSync x (Point blk) (Tip blk)))))
 
@@ -489,9 +489,9 @@ docTracers configFileName outputFileName _ _ _ = do
                 namesForTChainSyncNode
                 severityTChainSyncNode
                 allPublic
-    configureTracers trConfig docTChainSync [chainSyncNodeTr]
+    configureTracers trConfig docTChainSyncNodeToNode [chainSyncNodeTr]
     chainSyncNodeTrDoc <- documentTracer trConfig chainSyncNodeTr
-      (docTChainSync :: Documented (BlockFetch.TraceLabelPeer peer (TraceSendRecv
+      (docTChainSyncNodeToNode :: Documented (BlockFetch.TraceLabelPeer peer (TraceSendRecv
           (ChainSync x (Point blk) (Tip blk)))))
 
     chainSyncSerialisedTr <-  mkCardanoTracer
@@ -500,9 +500,9 @@ docTracers configFileName outputFileName _ _ _ = do
                 namesForTChainSyncSerialised
                 severityTChainSyncSerialised
                 allPublic
-    configureTracers trConfig docTChainSync [chainSyncSerialisedTr]
+    configureTracers trConfig docTChainSyncNodeToNodeSerisalised [chainSyncSerialisedTr]
     chainSyncSerialisedTrDoc <- documentTracer trConfig chainSyncSerialisedTr
-      (docTChainSync :: Documented (BlockFetch.TraceLabelPeer peer (TraceSendRecv
+      (docTChainSyncNodeToNodeSerisalised :: Documented (BlockFetch.TraceLabelPeer peer (TraceSendRecv
           (ChainSync x (Point blk) (Tip blk)))))
 
     blockFetchTr  <-  mkCardanoTracer

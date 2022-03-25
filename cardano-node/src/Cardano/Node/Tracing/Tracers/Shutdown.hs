@@ -67,7 +67,7 @@ instance LogFormatting ShutdownTrace where
                    , "slot"   .= toJSON slot ]
 
 docShutdown :: Documented ShutdownTrace
-docShutdown = addDocumentedNamespace  ["Shutdown"] docShutdown'
+docShutdown = addDocumentedNamespace  [] docShutdown'
 
 docShutdown' :: Documented ShutdownTrace
 docShutdown' = Documented

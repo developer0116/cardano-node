@@ -214,7 +214,7 @@ docChainSyncClientEvent ::
   Documented (BlockFetch.TraceLabelPeer peer (TraceChainSyncClientEvent blk))
 docChainSyncClientEvent =
     addDocumentedNamespace
-      ["ChainSyncClient", "ChainSyncClientEvent"]
+      ["ChainSyncClientEvent"]
       docChainSyncClientEvent'
 
 docChainSyncClientEvent' ::
@@ -392,7 +392,7 @@ docBlockFetchDecision ::
   Documented [BlockFetch.TraceLabelPeer remotePeer (FetchDecision [Point (Header blk)])]
 docBlockFetchDecision = Documented [
     DocMsg
-      ["BlockFetchDecision"]
+      []
       [("cardano.node.connectedPeers", "Number of connected peers")]
       "Throughout the decision making process we accumulate reasons to decline\
       \ to fetch any blocks. This message carries the intermediate and final\
@@ -467,10 +467,7 @@ instance LogFormatting (BlockFetch.TraceFetchClientState header) where
 
 docBlockFetchClient ::
   Documented (BlockFetch.TraceLabelPeer remotePeer (BlockFetch.TraceFetchClientState (Header blk)))
-docBlockFetchClient =
-    addDocumentedNamespace
-    ["BlockFetchClient"]
-    docBlockFetchClient'
+docBlockFetchClient = addDocumentedNamespace [] docBlockFetchClient'
 
 docBlockFetchClient' ::
   Documented (BlockFetch.TraceLabelPeer remotePeer (BlockFetch.TraceFetchClientState (Header blk)))
@@ -552,10 +549,7 @@ instance ConvertRawHash blk => LogFormatting (TraceBlockFetchServerEvent blk) wh
 
 docBlockFetchServer ::
   Documented (TraceBlockFetchServerEvent blk)
-docBlockFetchServer =
-    addDocumentedNamespace
-    ["BlockFetchServer"]
-    docBlockFetchServer'
+docBlockFetchServer = addDocumentedNamespace [] docBlockFetchServer'
 
 
 docBlockFetchServer' ::
@@ -645,10 +639,7 @@ instance LogFormatting (TraceTxSubmissionInbound txid tx) where
 docTxInbound ::
   Documented (BlockFetch.TraceLabelPeer remotePeer
     (TraceTxSubmissionInbound txid tx))
-docTxInbound =
-  addDocumentedNamespace
-    ["TxInbound"]
-    docTxInbound'
+docTxInbound = addDocumentedNamespace [] docTxInbound'
 
 docTxInbound' ::
   Documented (BlockFetch.TraceLabelPeer remotePeer
@@ -739,7 +730,7 @@ instance (Show txid, Show tx)
 docTxOutbound :: forall remotePeer txid tx.
   Documented (BlockFetch.TraceLabelPeer remotePeer
     (TraceTxSubmissionOutbound txid tx))
-docTxOutbound =  addDocumentedNamespace ["TxOutbound"] docTxOutbound'
+docTxOutbound =  addDocumentedNamespace [] docTxOutbound'
 
 docTxOutbound' :: forall remotePeer txid tx.
   Documented (BlockFetch.TraceLabelPeer remotePeer
@@ -781,7 +772,7 @@ instance LogFormatting (TraceLocalTxSubmissionServerEvent blk) where
 
 docLocalTxSubmissionServer :: Documented (TraceLocalTxSubmissionServerEvent blk)
 docLocalTxSubmissionServer =
-    addDocumentedNamespace ["LocalTxSubmissionServer"] docLocalTxSubmissionServer'
+    addDocumentedNamespace [] docLocalTxSubmissionServer'
 
 docLocalTxSubmissionServer' :: Documented (TraceLocalTxSubmissionServerEvent blk)
 docLocalTxSubmissionServer' = Documented [
@@ -870,7 +861,7 @@ instance LogFormatting MempoolSize where
       ]
 
 docMempool :: forall blk. Documented (TraceEventMempool blk)
-docMempool = addDocumentedNamespace ["Mempool"] docMempool'
+docMempool = addDocumentedNamespace [] docMempool'
 
 docMempool' :: forall blk. Documented (TraceEventMempool blk)
 docMempool' = Documented [
@@ -1222,7 +1213,7 @@ instance LogFormatting TraceStartLeadershipCheckPlus where
 
 docForge :: Documented (Either (TraceLabelCreds (TraceForgeEvent blk))
                                (TraceLabelCreds TraceStartLeadershipCheckPlus))
-docForge = addDocumentedNamespace ["Forge"] docForge'
+docForge = addDocumentedNamespace [] docForge'
 
 docForge' :: Documented (Either (TraceLabelCreds (TraceForgeEvent blk))
                                (TraceLabelCreds TraceStartLeadershipCheckPlus))
@@ -1461,7 +1452,7 @@ instance Show t => LogFormatting (TraceBlockchainTimeEvent t) where
 
 docBlockchainTime :: Documented (TraceBlockchainTimeEvent t)
 docBlockchainTime =
-    addDocumentedNamespace ["BlockchainTime"] docBlockchainTime'
+    addDocumentedNamespace [] docBlockchainTime'
 
 docBlockchainTime' :: Documented (TraceBlockchainTimeEvent t)
 docBlockchainTime' = Documented [
@@ -1535,7 +1526,7 @@ instance Show remotePeer => LogFormatting (TraceKeepAliveClient remotePeer) wher
 docKeepAliveClient :: Documented (TraceKeepAliveClient peer)
 docKeepAliveClient = Documented [
     DocMsg
-      ["KeepAliveClient"]
+      []
       []
       ""
   ]

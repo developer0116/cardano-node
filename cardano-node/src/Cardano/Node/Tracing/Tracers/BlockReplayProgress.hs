@@ -53,7 +53,7 @@ instance LogFormatting ReplayBlockStats where
 docReplayedBlock :: Documented ReplayBlockStats
 docReplayedBlock = Documented [
     DocMsg
-      ["ReplayBlock", "LedgerReplay"]
+      ["LedgerReplay"]
       [("Block replay progress (%)",
         "Progress in percent")]
       "Counts up the percent of a block replay."

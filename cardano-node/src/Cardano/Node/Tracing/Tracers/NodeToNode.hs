@@ -246,8 +246,8 @@ docTBlockFetch :: Documented
       (TraceSendRecv
         (BlockFetch x (Point blk))))
 docTBlockFetch =
-  addDocumentedNamespace  ["BlockFetch", "NodeToNode", "Send"] docTBlockFetch'
-  `addDocs` addDocumentedNamespace  ["BlockFetch", "NodeToNode", "Recieve"] docTBlockFetch'
+  addDocumentedNamespace  ["NodeToNode", "Send"] docTBlockFetch'
+  `addDocs` addDocumentedNamespace  ["NodeToNode", "Recieve"] docTBlockFetch'
 
 docTBlockFetch' :: Documented
       (BlockFetch.TraceLabelPeer peer
@@ -456,8 +456,8 @@ docTTxSubmissionNode :: Documented
     (TraceSendRecv
       (TXS.TxSubmission (GenTxId blk) (GenTx blk))))
 docTTxSubmissionNode =
-  addDocumentedNamespace  ["TxSubmission", "NodeToNode", "Send"] docTTxSubmissionNode'
-  `addDocs` addDocumentedNamespace  ["TxSubmission", "NodeToNode", "Recieve"] docTTxSubmissionNode'
+  addDocumentedNamespace  ["NodeToNode", "Send"] docTTxSubmissionNode'
+  `addDocs` addDocumentedNamespace  ["NodeToNode", "Recieve"] docTTxSubmissionNode'
 
 docTTxSubmissionNode' :: Documented
   (BlockFetch.TraceLabelPeer peer
@@ -632,8 +632,8 @@ docTTxSubmission2Node :: Documented
     (TraceSendRecv
       (TXS.TxSubmission2 (GenTxId blk) (GenTx blk))))
 docTTxSubmission2Node =
-  addDocumentedNamespace  ["TxSubmission2", "NodeToNode", "Send"] docTTxSubmission2Node'
-  `addDocs` addDocumentedNamespace  ["TxSubmission2", "NodeToNode", "Recieve"] docTTxSubmission2Node'
+  addDocumentedNamespace  ["NodeToNode", "Send"] docTTxSubmission2Node'
+  `addDocs` addDocumentedNamespace  ["NodeToNode", "Recieve"] docTTxSubmission2Node'
 
 docTTxSubmission2Node' :: Documented
   (BlockFetch.TraceLabelPeer peer

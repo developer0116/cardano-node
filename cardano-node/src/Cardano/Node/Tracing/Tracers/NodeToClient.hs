@@ -13,7 +13,6 @@ module Cardano.Node.Tracing.Tracers.NodeToClient
   , docTChainSyncNodeToClient
   , docTChainSyncNodeToNode
   , docTChainSyncNodeToNodeSerisalised
-  , docTChainSync
 
   , severityTTxMonitor
   , namesForTTxMonitor
@@ -149,21 +148,21 @@ instance LogFormatting (AnyMessageAndAgency (ChainSync blk pt tip)) where
 docTChainSyncNodeToClient :: Documented (BlockFetch.TraceLabelPeer peer (TraceSendRecv
     (ChainSync x (Point blk) (Tip blk))))
 docTChainSyncNodeToClient =
-    addDocumentedNamespace  ["ChainSyncClient", "NodeToClient", "Send"] docTChainSync
-    `addDocs` addDocumentedNamespace  ["ChainSyncClient", "NodeToClient", "Recieve"] docTChainSync
+    addDocumentedNamespace  ["NodeToClient", "Send"] docTChainSync
+    `addDocs` addDocumentedNamespace  ["NodeToClient", "Recieve"] docTChainSync
 
 
 docTChainSyncNodeToNode :: Documented (BlockFetch.TraceLabelPeer peer (TraceSendRecv
     (ChainSync x (Point blk) (Tip blk))))
 docTChainSyncNodeToNode =
-    addDocumentedNamespace  ["ChainSyncNode", "NodeToNode", "Send"] docTChainSync
-    `addDocs` addDocumentedNamespace  ["ChainSyncNode", "NodeToNode", "Recieve"] docTChainSync
+    addDocumentedNamespace  ["NodeToNode", "Send"] docTChainSync
+    `addDocs` addDocumentedNamespace  ["NodeToNode", "Recieve"] docTChainSync
 
 docTChainSyncNodeToNodeSerisalised :: Documented (BlockFetch.TraceLabelPeer peer (TraceSendRecv
     (ChainSync x (Point blk) (Tip blk))))
 docTChainSyncNodeToNodeSerisalised =
-    addDocumentedNamespace  ["ChainSyncSerialised", "NodeToNode", "Send"] docTChainSync
-    `addDocs` addDocumentedNamespace  ["ChainSyncSerialised", "NodeToNode", "Recieve"] docTChainSync
+    addDocumentedNamespace  ["NodeToNode", "Send"] docTChainSync
+    `addDocs` addDocumentedNamespace  ["NodeToNode", "Recieve"] docTChainSync
 
 
 docTChainSync :: Documented (BlockFetch.TraceLabelPeer peer (TraceSendRecv
@@ -312,8 +311,8 @@ docTTxMonitor :: Documented
         (LTM.LocalTxMonitor
            (GenTxId blk) (GenTx blk) SlotNo)))
 docTTxMonitor =
-  addDocumentedNamespace  ["TxMonitorClient", "Send"] docTState
-   `addDocs` addDocumentedNamespace  ["TxMonitorClient", "Recieve"] docTState
+  addDocumentedNamespace  ["Send"] docTState
+   `addDocs` addDocumentedNamespace  ["Recieve"] docTState
 
 
 --------------------------------------------------------------------------------
@@ -383,8 +382,8 @@ docTTxSubmission :: Documented
         (LTS.LocalTxSubmission
            (GenTx blk) (ApplyTxErr blk))))
 docTTxSubmission =
-  addDocumentedNamespace  ["TxSubmissionClient", "Send"] docTTxSubmission'
-   `addDocs` addDocumentedNamespace  ["TxSubmissionClient", "Recieve"] docTTxSubmission'
+  addDocumentedNamespace  ["Send"] docTTxSubmission'
+   `addDocs` addDocumentedNamespace  ["Recieve"] docTTxSubmission'
 
 docTTxSubmission' :: Documented
    (BlockFetch.TraceLabelPeer
@@ -502,8 +501,8 @@ docTStateQuery :: Documented
        (TraceSendRecv
        (LSQ.LocalStateQuery blk pt (Query blk))))
 docTStateQuery =
-   addDocumentedNamespace  ["StateQueryClient", "Send"] docTState
-    `addDocs` addDocumentedNamespace  ["StateQueryClient", "Recieve"] docTState
+   addDocumentedNamespace  ["Send"] docTState
+    `addDocs` addDocumentedNamespace  ["Recieve"] docTState
 
 docTState :: Documented
       (BlockFetch.TraceLabelPeer peer

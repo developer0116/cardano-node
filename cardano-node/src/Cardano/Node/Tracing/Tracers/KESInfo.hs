@@ -82,7 +82,7 @@ namesForKESInfo' _fsi = []
 docForgeKESInfo :: Documented (TraceLabelCreds HotKey.KESInfo)
 docForgeKESInfo = Documented [
     DocMsg
-      ["ForgeStateInfo"]
+      []
       []
       "kesStartPeriod \
       \\nkesEndPeriod is kesStartPeriod + tpraosMaxKESEvo\

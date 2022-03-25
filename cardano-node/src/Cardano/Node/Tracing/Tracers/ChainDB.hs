@@ -176,7 +176,7 @@ instance (  LogFormatting (Header blk)
   asMetrics (ChainDB.TraceVolatileDBEvent v)        = asMetrics v
 
 docChainDBTraceEvent :: Documented (ChainDB.TraceEvent blk)
-docChainDBTraceEvent = addDocumentedNamespace ["ChainDB"] docChainDBTraceEvent'
+docChainDBTraceEvent = addDocumentedNamespace [] docChainDBTraceEvent'
 
 docChainDBTraceEvent' :: Documented (ChainDB.TraceEvent blk)
 docChainDBTraceEvent' =

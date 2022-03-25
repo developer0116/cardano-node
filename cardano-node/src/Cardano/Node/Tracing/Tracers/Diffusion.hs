@@ -136,10 +136,10 @@ instance (LogFormatting peer, Show peer) =>
 
 
 docMuxLocal :: Documented (WithMuxBearer (NtN.ConnectionId LocalAddress) MuxTrace)
-docMuxLocal = addDocumentedNamespace  ["MuxLocal"] docMux'
+docMuxLocal = addDocumentedNamespace  [] docMux'
 
 docMuxRemote :: Documented (WithMuxBearer (NtN.ConnectionId NtN.RemoteAddress) MuxTrace)
-docMuxRemote = addDocumentedNamespace  ["Mux"] docMux'
+docMuxRemote = addDocumentedNamespace  [] docMux'
 
 
 docMux' :: Documented (WithMuxBearer peer MuxTrace)
@@ -307,8 +307,8 @@ instance LogFormatting (NtN.HandshakeTr NtN.RemoteAddress NtN.NodeToNodeVersion)
                                       <> ". " <> showT ev
 
 docHandshake :: Documented (NtN.HandshakeTr NtN.RemoteAddress ver)
-docHandshake = addDocumentedNamespace  ["Handshake", "Send"] docHandshake'
-               `addDocs` addDocumentedNamespace  ["Handshake", "Receive"] docHandshake'
+docHandshake = addDocumentedNamespace  ["Send"] docHandshake'
+               `addDocs` addDocumentedNamespace  ["Receive"] docHandshake'
 
 docHandshake' :: Documented (NtN.HandshakeTr adr ver)
 docHandshake' = Documented [
@@ -384,8 +384,8 @@ instance LogFormatting (NtC.HandshakeTr NtC.LocalAddress NtC.NodeToClientVersion
                                       <> ". " <> showT ev
 
 docLocalHandshake :: Documented (NtC.HandshakeTr LocalAddress ver)
-docLocalHandshake = addDocumentedNamespace  ["LocalHandshake", "Send"] docHandshake'
-               `addDocs` addDocumentedNamespace  ["LocalHandshake", "Receive"] docHandshake'
+docLocalHandshake = addDocumentedNamespace  ["Send"] docHandshake'
+               `addDocs` addDocumentedNamespace  ["Receive"] docHandshake'
 
 --------------------------------------------------------------------------------
 -- DiffusionInit Tracer
@@ -508,7 +508,7 @@ instance (Show ntnAddr, Show ntcAddr) =>
     ]
 
 docDiffusionInit :: Documented (ND.InitializationTracer Socket.SockAddr NtC.LocalAddress)
-docDiffusionInit =  addDocumentedNamespace  ["DiffusionInit"] docDiffusionInit'
+docDiffusionInit =  addDocumentedNamespace  [] docDiffusionInit'
 
 docDiffusionInit' :: Documented (ND.InitializationTracer Socket.SockAddr NtC.LocalAddress)
 docDiffusionInit' = Documented [
@@ -650,7 +650,7 @@ instance LogFormatting TraceLedgerPeers where
       ]
 
 docLedgerPeers :: Documented TraceLedgerPeers
-docLedgerPeers =  addDocumentedNamespace  ["LedgerPeers"] docLedgerPeers'
+docLedgerPeers =  addDocumentedNamespace  [] docLedgerPeers'
 
 docLedgerPeers' :: Documented TraceLedgerPeers
 docLedgerPeers' = Documented [
