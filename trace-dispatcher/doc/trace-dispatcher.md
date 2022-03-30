@@ -599,8 +599,10 @@ It forwards the metrics to cardano-tracer for further processing.
 
 ## DataPoints
 
-DataPoints are conceptually the metrics, but with an ADT structure, so they can trace
-any structured information. As a result, they give an ability for external processes
+DataPoints gives the ability for processes other then cardano-node to query the provided
+runtime state of a node. DataPoints are equal to metrics, in that they are not written in textual
+form to a log, but in contrast to metrics they have an ADT structure, so they can trace
+any structured information. As a result, they give the ability for external processes
 other then cardano-node to query the provided runtime state of a node (for example,
 node's basic information).
 
@@ -608,7 +610,13 @@ DataPoints are implemented as special tracers, which packs the objects into Data
 constructors and require a ToJSON instance for that objects. The set of DataPoints
 provided by the node is structured using the same namespace as metrics and log messages.
 But otherwise DataPoints work independent of tracing, but are written in a local store,
-so the latest value of the particular DataPoint can be queried on demand.
+so the latest value of a particular DataPoint can be queried on demand.
+
+Also, [there is a document](https://github.com/input-output-hk/cardano-node/wiki/cardano-node-and-DataPoints:-demo)
+describing how to accept DataPoints from an external process.
+
+[`demo-acceptor`](https://github.com/input-output-hk/cardano-node/blob/master/cardano-tracer/demo/acceptor.hs)
+application allows to ask for particular DataPoint by its name and display its value.
 
 ```haskell
 -- A simple dataPointTracer which supports building a namespace
@@ -774,9 +782,14 @@ For a quick start into new tracing see the document:
 
 [New Tracing Quickstart](https://github.com/input-output-hk/cardano-node/blob/master/doc/New%20Tracing%20Quickstart.md)
 
-This document describes a seperate service for logging and monitoring Cardano nodes:
+This document describes a separate service for logging and monitoring Cardano nodes:
 
 [Cardano Tracer](https://github.com/input-output-hk/cardano-node/blob/master/cardano-tracer/docs/cardano-tracer.md)
+
+This document describes how to accept DataPoints from an external process:
+
+[cardano node and DataPoints: demo](https://github.com/input-output-hk/cardano-node/wiki/cardano-node-and-DataPoints:-demo)
+
 
 ## Future work
 
