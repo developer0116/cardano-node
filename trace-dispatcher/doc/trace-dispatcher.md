@@ -620,6 +620,8 @@ mkDataPointTracer trDataPoint namesFor = do
     pure $ withNamesAppended namesFor tr```
 ```
 
+Also, [there is a document](https://github.com/input-output-hk/cardano-node/wiki/cardano-node-and-DataPoints:-demo)
+describing how to accept DataPoints from an external process. [`demo-acceptor`](https://github.com/input-output-hk/cardano-node/blob/master/cardano-tracer/demo/acceptor.hs) application allows to ask for particular DataPoint by its name and display its value.
 
 # Integration and implementation in the node
 
