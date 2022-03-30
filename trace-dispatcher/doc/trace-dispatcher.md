@@ -599,12 +599,16 @@ It forwards the metrics to cardano-tracer for further processing.
 
 ## DataPoints
 
-DataPoints gives the ability for processes other then cardano-node to query the provided
-runtime state of a node. DataPoints are implemented as special tracers, which packs
-the objects into DataPoint constructors and require a ToJSON instance. DataPoints must
-be given a namespace, as all other trace messages. But otherwise datapoints work
-independent of tracing, but are written in a store, so that the values can be queried
-on demand.
+DataPoints are conceptually the metrics, but with an ADT structure, so they can trace
+any structured information. As a result, they give an ability for external processes
+other then cardano-node to query the provided runtime state of a node (for example,
+node's basic information).
+
+DataPoints are implemented as special tracers, which packs the objects into DataPoint
+constructors and require a ToJSON instance for that objects. The set of DataPoints
+provided by the node is structured using the same namespace as metrics and log messages.
+But otherwise DataPoints work independent of tracing, but are written in a local store,
+so the latest value of the particular DataPoint can be queried on demand.
 
 ```haskell
 -- A simple dataPointTracer which supports building a namespace
