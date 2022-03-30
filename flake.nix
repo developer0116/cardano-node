@@ -36,7 +36,7 @@
       url = "github:input-output-hk/cardano-node";
     };
     node-snapshot = {
-      url = "github:input-output-hk/cardano-node/7f00e3ea5a61609e19eeeee4af35241571efdf5c";
+      url = "github:input-output-hk/cardano-node/node-snapshot";
     };
     node-process = {
       url = "github:input-output-hk/cardano-node";
@@ -44,9 +44,7 @@
     };
     ## This pin is to prevent workbench-produced geneses being regenerated each time the node is bumped.
     cardano-node-workbench = {
-      url = "github:input-output-hk/cardano-node/ed9932c52aaa535b71f72a5b4cc0cecb3344a5a3";
-      # This is to avoid circular import (TODO: remove this workbench pin entirely using materialization):
-      inputs.membench.url = "github:input-output-hk/empty-flake";
+      url = "github:input-output-hk/cardano-node/78675fbf8986c87c0d2356b727a0ec2060f1adba";
     };
 
     cardano-mainnet-mirror.url = "github:input-output-hk/cardano-mainnet-mirror/nix";
